@@ -1,34 +1,38 @@
 const graphql = require('graphql');
 const _ = require('lodash');
+const Db = require('../database/model.js');
 
-const {GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID} = graphql;
+const {
+    GraphQLObjectType,
+    GraphQLNonNull,
+    GraphQLString,
+    GraphQLSchema,
+    GraphQLID,
+    GraphQLList,
+} = graphql;
 
-// dummy data
-var books = [
-    {name: 'Name of the wind', genre: 'Fantasy', id: '1'},
-    {name: 'Name of the wind2', genre: 'Fantasy1', id: '2' },
-    {name: 'Name of the wind3', genre: 'Fantasy2', id: '3' },
-]
-
-const BookType = new GraphQLObjectType({
-    name: 'Book',
+const UserType = new GraphQLObjectType({
+    name: 'User',
     fields: () => ({
-        id: { type: GraphQLID},
-        name: {type: GraphQLString},
-        genre: {type: GraphQLString}
+        id: { type: GraphQLID },
+        firstName: { type: GraphQLString },
+        lastName: { type: GraphQLString }
     })
 });
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-        book: {
-            type: BookType,
-            args: { id: { type: GraphQLID}},
-            resolve(parent, args) {
-                // code to get data from db / other source
-                return _.find(books, { id: args.id });
-            }
+        users: {
+            type: new GraphQLList(UserType),
+            args: {
+                id: {
+                    type: GraphQLID
+                }
+            },
+            resolve: async (source, args) => {
+                return Db.models.users.findAll({ where: args })
+            },
         }
     }
 });

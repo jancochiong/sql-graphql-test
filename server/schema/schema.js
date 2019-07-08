@@ -28,6 +28,12 @@ const RootQuery = new GraphQLObjectType({
             args: {
                 id: {
                     type: GraphQLID
+                },
+                firstName:{
+                    type: GraphQLString
+                },
+                lastName: {
+                    type: GraphQLString
                 }
             },
             resolve: async (source, args) => {
